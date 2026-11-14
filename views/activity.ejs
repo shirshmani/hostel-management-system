@@ -1,0 +1,37 @@
+<%- include('partials/head', { title: 'Activity log' }) %>
+<div class="card">
+  <form class="toolbar" method="get" action="/activity">
+    <div>
+      <label for="table">Table</label>
+      <select id="table" name="table">
+        <option value="">All</option>
+        <option value="student" <%= table === 'student' ? 'selected' : '' %>>Student</option>
+        <option value="complaint" <%= table === 'complaint' ? 'selected' : '' %>>Complaint</option>
+        <option value="fee" <%= table === 'fee' ? 'selected' : '' %>>Fee</option>
+      </select>
+    </div>
+    <button class="btn btn-ghost" type="submit">Show</button>
+  </form>
+  <% if (logs.length === 0) { %>
+    <div class="empty-state"><%- icon('activity') %><p>No activity yet.</p></div>
+  <% } else { %>
+    <div class="table-wrap">
+      <table class="table-stack">
+        <thead><tr><th>Time</th><th>Table</th><th>Record</th><th>Action</th><th>Details</th></tr></thead>
+        <tbody>
+          <% logs.forEach(function (l) { %>
+            <tr>
+              <td data-label="Time"><%= l.changed_at %></td>
+              <td data-label="Table"><%= l.table_name %></td>
+              <td data-label="Record"><%= l.record_key %></td>
+              <td data-label="Action"><%= l.action %></td>
+              <td data-label="Details"><%= l.details %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+  <p class="muted">Last 50 entries, written by database triggers. The log has no foreign keys, so it stays even when records are deleted.</p>
+</div>
+<%- include('partials/foot') %>

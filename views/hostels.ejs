@@ -1,0 +1,68 @@
+<%- include('partials/head', { title: 'Hostels & Departments' }) %>
+<div class="card">
+  <h2>Hostels</h2>
+  <form class="toolbar" method="post" action="/hostels">
+    <div class="grow">
+      <label for="hostel_name">New hostel name</label>
+      <input id="hostel_name" name="hostel_name" required maxlength="50">
+    </div>
+    <div>
+      <label for="gender_type">Type</label>
+      <select id="gender_type" name="gender_type"><option value="M">Boys</option><option value="F">Girls</option></select>
+    </div>
+    <button class="btn btn-primary" type="submit">Add hostel</button>
+  </form>
+
+  <% if (hostels.length === 0) { %>
+    <div class="empty-state"><%- icon('hostel') %><p>No hostels yet.</p></div>
+  <% } %>
+  <% hostels.forEach(function (h) { %>
+    <div class="row-item">
+      <form class="row-form" method="post" action="/hostels/<%= h.hostel_id %>/update">
+        <input name="hostel_name" value="<%= h.hostel_name %>" required maxlength="50" aria-label="Hostel name">
+        <select name="gender_type" aria-label="Hostel type">
+          <option value="M" <%= h.gender_type === 'M' ? 'selected' : '' %>>Boys</option>
+          <option value="F" <%= h.gender_type === 'F' ? 'selected' : '' %>>Girls</option>
+        </select>
+        <span class="count"><%= h.rooms %> rooms &middot; <%= h.students %> students</span>
+        <button class="btn btn-sm btn-ghost" type="submit">Save</button>
+      </form>
+      <form method="post" action="/hostels/<%= h.hostel_id %>/delete" data-confirm="Delete the hostel &quot;<%= h.hostel_name %>&quot;?">
+        <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+      </form>
+    </div>
+  <% }); %>
+</div>
+
+<div class="card">
+  <h2>Departments</h2>
+  <form class="toolbar" method="post" action="/hostels/departments">
+    <div class="grow">
+      <label for="dept_name">New department name</label>
+      <input id="dept_name" name="dept_name" required maxlength="80">
+    </div>
+    <div>
+      <label for="dept_code">Code</label>
+      <input id="dept_code" name="dept_code" required maxlength="10" placeholder="CSE">
+    </div>
+    <button class="btn btn-primary" type="submit">Add department</button>
+  </form>
+
+  <% if (departments.length === 0) { %>
+    <div class="empty-state"><%- icon('students') %><p>No departments yet.</p></div>
+  <% } %>
+  <% departments.forEach(function (d) { %>
+    <div class="row-item">
+      <form class="row-form" method="post" action="/hostels/departments/<%= d.dept_id %>/update">
+        <input name="dept_name" value="<%= d.dept_name %>" required maxlength="80" aria-label="Department name">
+        <input name="dept_code" value="<%= d.dept_code %>" required maxlength="10" aria-label="Department code">
+        <span class="count"><%= d.students %> students</span>
+        <button class="btn btn-sm btn-ghost" type="submit">Save</button>
+      </form>
+      <form method="post" action="/hostels/departments/<%= d.dept_id %>/delete" data-confirm="Delete the department &quot;<%= d.dept_name %>&quot;?">
+        <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+      </form>
+    </div>
+  <% }); %>
+</div>
+<%- include('partials/foot') %>

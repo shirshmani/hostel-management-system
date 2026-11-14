@@ -1,0 +1,46 @@
+<%- include('partials/head', { title: title }) %>
+<div class="card form-card">
+  <h2><%= title %></h2>
+  <% if (mode === 'edit') { %>
+    <p class="muted"><%= room.occupied %> student(s) live in this room. Capacity cannot go below that number, and a room with students cannot move to another hostel.</p>
+  <% } %>
+  <form method="post" action="<%= mode === 'add' ? '/rooms' : '/rooms/' + room.room_id + '/update' %>">
+    <div class="form-group">
+      <label for="hostel_id">Hostel</label>
+      <select id="hostel_id" name="hostel_id" required>
+        <option value="">Choose a hostel</option>
+        <% hostels.forEach(function (h) { %>
+          <option value="<%= h.hostel_id %>" <%= room.hostel_id === h.hostel_id ? 'selected' : '' %>><%= h.hostel_name %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="room_number">Room number</label>
+        <input id="room_number" name="room_number" value="<%= room.room_number %>" required maxlength="10">
+      </div>
+      <div class="form-group">
+        <label for="floor">Floor</label>
+        <input id="floor" name="floor" type="number" min="0" max="20" value="<%= room.floor %>" required>
+      </div>
+      <div class="form-group">
+        <label for="capacity">Type</label>
+        <select id="capacity" name="capacity" required>
+          <option value="1" <%= room.capacity === 1 ? 'selected' : '' %>>Single (1 bed)</option>
+          <option value="2" <%= room.capacity === 2 ? 'selected' : '' %>>Double (2 beds)</option>
+          <option value="3" <%= room.capacity === 3 ? 'selected' : '' %>>Triple (3 beds)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="fee_per_term">Fee per term (&#8377;)</label>
+        <input id="fee_per_term" name="fee_per_term" type="number" min="0" max="999999" step="0.01" value="<%= room.fee_per_term %>" required>
+        <div class="hint">Fees that were already issued do not change.</div>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">Save room</button>
+      <a class="btn btn-ghost" href="/rooms">Cancel</a>
+    </div>
+  </form>
+</div>
+<%- include('partials/foot') %>

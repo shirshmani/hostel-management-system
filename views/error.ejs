@@ -1,0 +1,8 @@
+<%- include('partials/head', { title: title, bare: bare }) %>
+<div class="card center-card">
+  <div class="big-code"><%= status %></div>
+  <h2><%= title %></h2>
+  <p class="muted"><%= message %></p>
+  <a class="btn btn-primary" href="<%= user ? homeUrl : '/login' %>"><%= user ? 'Back to my home page' : 'Go to login' %></a>
+</div>
+<%- include('partials/foot', { bare: bare }) %>

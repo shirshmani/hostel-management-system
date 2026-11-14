@@ -1,0 +1,13 @@
+<% if (!locals.bare) { %>
+    </main>
+  </div>
+</div>
+<% } %>
+<div id="toasts" class="toasts"></div>
+<% if (flash) { %>
+<!-- the flash message is passed in data attributes (escaped), and app.js shows it as a toast -->
+<div id="flash-data" hidden data-type="<%= flash.type %>" data-text="<%= flash.text %>"></div>
+<% } %>
+<script src="/js/app.js"></script>
+</body>
+</html>

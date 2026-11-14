@@ -1,0 +1,19 @@
+<%
+  var roleLabel = user.role.charAt(0) + user.role.slice(1).toLowerCase();
+%>
+<header class="topbar">
+  <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Open menu"><%- icon('menu') %></button>
+  <h1 class="page-title"><%= title %></h1>
+  <div class="topbar-right">
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch light or dark theme">
+      <span class="icon-moon"><%- icon('moon') %></span><span class="icon-sun"><%- icon('sun') %></span>
+    </button>
+    <div class="user-chip">
+      <span class="avatar"><%= user.name.charAt(0).toUpperCase() %></span>
+      <span class="user-text">
+        <strong><%= user.name %></strong>
+        <small><%= roleLabel %><% if (user.hostelName) { %> &middot; <%= user.hostelName %><% } %></small>
+      </span>
+    </div>
+  </div>
+</header>

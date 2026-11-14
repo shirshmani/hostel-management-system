@@ -1,0 +1,59 @@
+<%- include('partials/head', { title: title }) %>
+<div class="card form-card">
+  <h2><%= title %></h2>
+  <form method="post" action="<%= mode === 'add' ? '/students' : '/students/' + student.roll_no + '/update' %>">
+    <div class="form-group">
+      <label for="roll_no">Roll number</label>
+      <% if (mode === 'add') { %>
+        <input id="roll_no" name="roll_no" value="<%= student.roll_no %>" required minlength="4" maxlength="10" pattern="[A-Za-z0-9]+" placeholder="25CSE050">
+        <div class="hint">4 to 10 letters or digits. The first password is the same as the roll number.</div>
+      <% } else { %>
+        <input id="roll_no" value="<%= student.roll_no %>" readonly>
+      <% } %>
+    </div>
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input id="name" name="name" value="<%= student.name %>" required maxlength="100">
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="gender">Gender</label>
+        <select id="gender" name="gender" required>
+          <option value="M" <%= student.gender === 'M' ? 'selected' : '' %>>Male</option>
+          <option value="F" <%= student.gender === 'F' ? 'selected' : '' %>>Female</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="admission_year">Admission year</label>
+        <input id="admission_year" name="admission_year" type="number" min="2000" max="2100" value="<%= student.admission_year %>" required>
+      </div>
+      <div class="form-group">
+        <label for="dept_id">Department</label>
+        <select id="dept_id" name="dept_id" required>
+          <option value="">Choose a department</option>
+          <% departments.forEach(function (d) { %>
+            <option value="<%= d.dept_id %>" <%= student.dept_id === d.dept_id ? 'selected' : '' %>><%= d.dept_name %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="status">Status</label>
+        <select id="status" name="status">
+          <option value="ON_CAMPUS" <%= student.status === 'ON_CAMPUS' ? 'selected' : '' %>>On campus</option>
+          <option value="ON_LEAVE" <%= student.status === 'ON_LEAVE' ? 'selected' : '' %>>On leave</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="phone">Phone (optional)</label>
+      <input id="phone" name="phone" value="<%= student.phone %>" inputmode="numeric" pattern="[0-9]{10}" maxlength="10">
+      <div class="hint">Exactly 10 digits.</div>
+    </div>
+    <p class="muted">The room is given on the Allocation page, not here.</p>
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">Save student</button>
+      <a class="btn btn-ghost" href="/students">Cancel</a>
+    </div>
+  </form>
+</div>
+<%- include('partials/foot') %>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %> | Hostel Management</title>
+  <script>
+    // Set the saved theme before the page is drawn, so there is no flash of the wrong theme
+    (function () {
+      var theme = 'light';
+      try {
+        theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      } catch (e) {}
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="<%= locals.bare ? 'bare' : '' %>">
+<% if (!locals.bare) { %>
+<div class="app">
+  <%- include('sidebar') %>
+  <div class="main">
+    <%- include('topbar') %>
+    <main class="content">
+<% } %>

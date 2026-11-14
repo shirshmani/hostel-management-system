@@ -1,0 +1,79 @@
+<%- include('partials/head', { title: 'Home' }) %>
+<div class="card">
+  <h2>Welcome, <%= me.name %></h2>
+  <dl class="kv">
+    <dt>Roll number</dt><dd><%= me.roll_no %></dd>
+    <dt>Department</dt><dd><%= me.dept_name %></dd>
+    <dt>Status</dt><dd><span class="badge badge-<%= me.status.toLowerCase() %>"><%= me.status.replace('_', ' ') %></span></dd>
+    <dt>Hostel and room</dt><dd><%= me.room_number ? me.hostel_name + ' / room ' + me.room_number + ' (floor ' + me.floor + ')' : 'Not allocated yet' %></dd>
+    <dt>Check-in</dt><dd><%= me.check_in_date || '-' %></dd>
+    <dt>Check-out</dt><dd><%= me.check_out_date || '-' %></dd>
+  </dl>
+</div>
+
+<div class="card">
+  <h2>Roommates</h2>
+  <% if (roommates.length === 0) { %>
+    <p class="muted"><%= me.room_number ? 'You have no roommates.' : 'No roommates (you have no room yet).' %></p>
+  <% } else { %>
+    <div class="table-wrap">
+      <table class="table-stack">
+        <thead><tr><th>Roll no</th><th>Name</th><th>Department</th></tr></thead>
+        <tbody>
+          <% roommates.forEach(function (m) { %>
+            <tr><td data-label="Roll no"><%= m.roll_no %></td><td data-label="Name"><%= m.name %></td><td data-label="Department"><%= m.dept_code %></td></tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<div class="card">
+  <div class="section-head">
+    <h2>My fees</h2>
+    <a class="btn btn-sm btn-ghost" href="/fees">All fees</a>
+  </div>
+  <p>Still to pay: <strong><%= money(dues.pending) %></strong> (<%= dues.n %> fee(s))</p>
+  <% if (fees.length === 0) { %>
+    <p class="muted">No fees have been issued to you yet.</p>
+  <% } else { %>
+    <div class="table-wrap">
+      <table class="table-stack">
+        <thead><tr><th>Term</th><th>Amount</th><th>Due date</th><th>Status</th></tr></thead>
+        <tbody>
+          <% fees.forEach(function (f) { %>
+            <tr>
+              <td data-label="Term"><%= f.term %></td>
+              <td data-label="Amount"><%= money(f.amount) %></td>
+              <td data-label="Due date" class="<%= f.state === 'OVERDUE' ? 'text-danger' : '' %>"><%= f.due_date %></td>
+              <td data-label="Status"><span class="badge badge-<%= f.state.toLowerCase() %>"><%= f.state %></span></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<div class="card">
+  <div class="section-head">
+    <h2>My complaints</h2>
+    <a class="btn btn-sm btn-ghost" href="/complaints">All complaints</a>
+  </div>
+  <% if (complaints.length === 0) { %>
+    <p class="muted">You have not raised any complaint.</p>
+  <% } %>
+  <% complaints.forEach(function (c) { %>
+    <div class="complaint-card">
+      <div class="complaint-head">
+        <strong><%= c.category.charAt(0) + c.category.slice(1).toLowerCase() %></strong>
+        <span class="badge badge-<%= c.status.toLowerCase() %>"><%= c.status.replace('_', ' ') %></span>
+        <span class="muted"><%= c.created_at.slice(0, 10) %></span>
+      </div>
+      <p><%= c.description %></p>
+      <% if (c.admin_remarks) { %><p><strong>Remarks:</strong> <%= c.admin_remarks %></p><% } %>
+    </div>
+  <% }); %>
+</div>
+<%- include('partials/foot') %>

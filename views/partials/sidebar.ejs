@@ -1,0 +1,57 @@
+<%
+  // Menu per role: [label, link, icon]. Links to pages that are not built yet show the 404 page.
+  var menus = {
+    ADMIN: [
+      ['Dashboard', '/dashboard', 'dashboard'],
+      ['Students', '/students', 'students'],
+      ['Wardens', '/wardens', 'warden'],
+      ['Hostels & Departments', '/hostels', 'hostel'],
+      ['Rooms', '/rooms', 'rooms'],
+      ['Allocation', '/allocation', 'allocation'],
+      ['Complaints', '/complaints', 'complaints'],
+      ['Fees', '/fees', 'fees'],
+      ['Admin accounts', '/admins', 'admins'],
+      ['Activity log', '/activity', 'activity']   // ADV: delete this line if you drop the audit log
+    ],
+    WARDEN: [
+      ['Dashboard', '/dashboard', 'dashboard'],
+      ['Students', '/students', 'students'],
+      ['Allocation', '/allocation', 'allocation'],
+      ['Complaints', '/complaints', 'complaints'],
+      ['Fees', '/fees', 'fees']
+    ],
+    STUDENT: [
+      ['Home', '/home', 'dashboard'],
+      ['My complaints', '/complaints', 'complaints'],
+      ['My fees', '/fees', 'fees']
+    ]
+  };
+  var items = menus[user.role] || [];
+
+  // a link is active when we are on that page or below it
+  function isActive(link) {
+    return currentPath === link || currentPath.indexOf(link + '/') === 0;
+  }
+%>
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <span class="brand-mark">H</span>
+    <span>Hostel<br>Management</span>
+  </div>
+  <nav>
+    <% items.forEach(function (item) { %>
+      <a class="nav-link <%= isActive(item[1]) ? 'active' : '' %>" href="<%= item[1] %>">
+        <%- icon(item[2]) %><span><%= item[0] %></span>
+      </a>
+    <% }); %>
+  </nav>
+  <div class="sidebar-footer">
+    <a class="nav-link <%= isActive('/account/password') ? 'active' : '' %>" href="/account/password">
+      <%- icon('key') %><span>Change password</span>
+    </a>
+    <form method="post" action="/logout">
+      <button class="nav-link nav-button" type="submit"><%- icon('logout') %><span>Log out</span></button>
+    </form>
+  </div>
+</aside>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>

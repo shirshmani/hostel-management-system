@@ -1,0 +1,37 @@
+<%- include('partials/head', { title: 'Admin accounts' }) %>
+<div class="card">
+  <h2>Admin accounts</h2>
+  <form class="toolbar" method="post" action="/admins">
+    <div class="grow">
+      <label for="username">New admin username</label>
+      <input id="username" name="username" required minlength="3" maxlength="50" pattern="[A-Za-z0-9._\-]+">
+      <div class="hint">The first password is the same as the username.</div>
+    </div>
+    <button class="btn btn-primary" type="submit">Add admin</button>
+  </form>
+  <div class="table-wrap">
+    <table class="table-stack">
+      <thead><tr><th>Username</th><th></th></tr></thead>
+      <tbody>
+        <% admins.forEach(function (a) { %>
+          <tr>
+            <td data-label="Username"><%= a.username %><% if (a.user_id === user.userId) { %> <span class="badge">you</span><% } %></td>
+            <td data-label="Actions">
+              <div class="actions">
+                <form method="post" action="/admins/<%= a.user_id %>/reset-password" data-confirm="Reset the password of <%= a.username %> to the username?">
+                  <button class="btn btn-sm btn-ghost" type="submit">Reset password</button>
+                </form>
+                <% if (a.user_id !== user.userId) { %>
+                  <form method="post" action="/admins/<%= a.user_id %>/delete" data-confirm="Delete the admin <%= a.username %>?">
+                    <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                  </form>
+                <% } %>
+              </div>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- include('partials/foot') %>

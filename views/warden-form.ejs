@@ -1,0 +1,39 @@
+<%- include('partials/head', { title: title }) %>
+<div class="card form-card">
+  <h2><%= title %></h2>
+  <form method="post" action="<%= mode === 'add' ? '/wardens' : '/wardens/' + warden.warden_id + '/update' %>">
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input id="name" name="name" value="<%= warden.name %>" required maxlength="100">
+    </div>
+    <div class="form-group">
+      <label for="phone">Phone (optional)</label>
+      <input id="phone" name="phone" value="<%= warden.phone %>" inputmode="numeric" pattern="[0-9]{10}" maxlength="10">
+      <div class="hint">Exactly 10 digits.</div>
+    </div>
+    <div class="form-group">
+      <label for="hostel_id">Hostel</label>
+      <select id="hostel_id" name="hostel_id" required>
+        <option value="">Choose a hostel</option>
+        <% hostels.forEach(function (h) { %>
+          <option value="<%= h.hostel_id %>" <%= warden.hostel_id === h.hostel_id ? 'selected' : '' %>><%= h.hostel_name %></option>
+        <% }); %>
+      </select>
+    </div>
+    <% if (mode === 'add') { %>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input id="username" name="username" value="<%= warden.username %>" required minlength="3" maxlength="50" pattern="[A-Za-z0-9._\-]+">
+        <div class="hint">The first password is the same as the username.</div>
+      </div>
+    <% } else { %>
+      <p class="muted">Login: <%= warden.username || 'none' %> (cannot be changed here)</p>
+      <input type="hidden" name="username_shown" value="<%= warden.username || '' %>">
+    <% } %>
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">Save warden</button>
+      <a class="btn btn-ghost" href="/wardens">Cancel</a>
+    </div>
+  </form>
+</div>
+<%- include('partials/foot') %>

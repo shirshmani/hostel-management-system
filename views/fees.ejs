@@ -1,0 +1,134 @@
+<%- include('partials/head', { title: title }) %>
+<% if (user.role === 'STUDENT') { %>
+  <div class="card">
+    <h2>My fees</h2>
+    <p>Total still to pay: <strong><%= money(pending) %></strong></p>
+    <% if (fees.length === 0) { %>
+      <div class="empty-state"><%- icon('fees') %><p>No fees have been issued to you yet.</p></div>
+    <% } else { %>
+    <div class="table-wrap">
+      <table class="table-stack">
+        <thead><tr><th>Term</th><th>Amount</th><th>Due date</th><th>Status</th><th>Paid on</th><th></th></tr></thead>
+        <tbody>
+          <% fees.forEach(function (f) { %>
+            <tr>
+              <td data-label="Term"><%= f.term %></td>
+              <td data-label="Amount"><%= money(f.amount) %></td>
+              <td data-label="Due date" class="<%= f.state === 'OVERDUE' ? 'text-danger' : '' %>"><%= f.due_date %></td>
+              <td data-label="Status"><span class="badge badge-<%= f.state.toLowerCase() %>"><%= f.state %></span></td>
+              <td data-label="Paid on"><%= f.paid_on || '-' %></td>
+              <td data-label="Receipt"><% if (f.status === 'PAID') { %><a class="btn btn-sm btn-ghost" href="/fees/<%= f.fee_id %>/receipt">Receipt</a><% } %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+  </div>
+<% } else { %>
+  <div class="summary-grid">
+    <div class="summary-item"><div class="label">Collected</div><div class="value"><%= money(summary.PAID.total) %></div><div class="sub"><%= summary.PAID.n %> fee(s) paid</div></div>
+    <div class="summary-item"><div class="label">Pending (not yet due)</div><div class="value"><%= money(summary.PENDING.total) %></div><div class="sub"><%= summary.PENDING.n %> fee(s)</div></div>
+    <div class="summary-item"><div class="label">Overdue</div><div class="value text-danger"><%= money(summary.OVERDUE.total) %></div><div class="sub"><%= summary.OVERDUE.n %> fee(s)</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Overdue ageing</h2>
+    <% if (ageing.length === 0) { %>
+      <p class="muted">No overdue fees.</p>
+    <% } else { %>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Overdue for</th><th>Fees</th><th>Amount</th></tr></thead>
+          <tbody>
+            <% ageing.forEach(function (a) { %>
+              <tr><td><%= a.bucket %></td><td><%= a.fees %></td><td><%= money(a.total) %></td></tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+
+  <% if (user.role === 'ADMIN') { %>
+  <div class="card">
+    <h2>Generate fees for a term</h2>
+    <p class="muted">Creates a fee for every student who has a room now (amount = the room's fee). Running it again for the same term only adds fees for students who got a room since.</p>
+    <form class="toolbar" method="post" action="/fees/generate" data-confirm="Generate the fees of this term for every student who has a room?">
+      <div>
+        <label for="term">Term</label>
+        <input id="term" name="term" required minlength="3" maxlength="20" placeholder="2027-EVEN">
+      </div>
+      <div>
+        <label for="due_date">Due date</label>
+        <input id="due_date" name="due_date" type="date" required>
+      </div>
+      <button class="btn btn-primary" type="submit">Generate</button>
+    </form>
+  </div>
+  <% } %>
+
+  <div class="card">
+    <form class="toolbar" method="get" action="/fees">
+      <div>
+        <label for="state">Status</label>
+        <select id="state" name="state">
+          <option value="">All</option>
+          <option value="OVERDUE" <%= stateFilter === 'OVERDUE' ? 'selected' : '' %>>Overdue</option>
+          <option value="PENDING" <%= stateFilter === 'PENDING' ? 'selected' : '' %>>Pending</option>
+          <option value="PAID" <%= stateFilter === 'PAID' ? 'selected' : '' %>>Paid</option>
+        </select>
+      </div>
+      <div>
+        <label for="term-filter">Term</label>
+        <select id="term-filter" name="term">
+          <option value="">All terms</option>
+          <% terms.forEach(function (t) { %>
+            <option value="<%= t.term %>" <%= termFilter === t.term ? 'selected' : '' %>><%= t.term %></option>
+          <% }); %>
+        </select>
+      </div>
+      <button class="btn btn-ghost" type="submit">Show</button>
+      <div class="grow">
+        <label for="live">Filter the rows below</label>
+        <input id="live" type="search" data-filter="fees-table" placeholder="Name or roll number">
+      </div>
+    </form>
+
+    <% if (fees.length === 0) { %>
+      <div class="empty-state"><%- icon('fees') %><p>No fees found.</p></div>
+    <% } else { %>
+    <div class="table-wrap">
+      <table id="fees-table" class="table-stack">
+        <thead><tr><th>Roll no</th><th>Student</th><th>Room</th><th>Term</th><th>Amount</th><th>Due date</th><th>Status</th><th>Paid on</th><th></th></tr></thead>
+        <tbody>
+          <% fees.forEach(function (f) { %>
+            <tr>
+              <td data-label="Roll no"><%= f.roll_no %></td>
+              <td data-label="Student"><%= f.student_name %></td>
+              <td data-label="Room"><%= f.room_number ? f.hostel_name + ' / ' + f.room_number : 'No room' %></td>
+              <td data-label="Term"><%= f.term %></td>
+              <td data-label="Amount"><%= money(f.amount) %></td>
+              <td data-label="Due date" class="<%= f.state === 'OVERDUE' ? 'text-danger' : '' %>"><%= f.due_date %></td>
+              <td data-label="Status"><span class="badge badge-<%= f.state.toLowerCase() %>"><%= f.state %></span></td>
+              <td data-label="Paid on"><%= f.paid_on || '-' %></td>
+              <td data-label="Actions">
+                <div class="actions">
+                  <% if (f.status === 'PENDING') { %>
+                    <form method="post" action="/fees/<%= f.fee_id %>/pay" data-confirm="Mark the <%= f.term %> fee of <%= f.student_name %> as paid?">
+                      <button class="btn btn-sm btn-primary" type="submit">Mark paid</button>
+                    </form>
+                  <% } else { %>
+                    <a class="btn btn-sm btn-ghost" href="/fees/<%= f.fee_id %>/receipt">Receipt</a>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+  </div>
+<% } %>
+<%- include('partials/foot') %>

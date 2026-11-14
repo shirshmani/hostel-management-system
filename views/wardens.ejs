@@ -1,0 +1,38 @@
+<%- include('partials/head', { title: 'Wardens' }) %>
+<div class="card">
+  <div class="section-head">
+    <h2>Wardens</h2>
+    <a class="btn btn-primary" href="/wardens/new">Add warden</a>
+  </div>
+  <% if (wardens.length === 0) { %>
+    <div class="empty-state"><%- icon('warden') %><p>No wardens yet.</p></div>
+  <% } else { %>
+  <div class="table-wrap">
+    <table class="table-stack">
+      <thead><tr><th>Name</th><th>Phone</th><th>Hostel</th><th>Login</th><th></th></tr></thead>
+      <tbody>
+        <% wardens.forEach(function (w) { %>
+          <tr>
+            <td data-label="Name"><%= w.name %></td>
+            <td data-label="Phone"><%= w.phone || '-' %></td>
+            <td data-label="Hostel"><%= w.hostel_name %></td>
+            <td data-label="Login"><%= w.username || 'none' %></td>
+            <td data-label="Actions">
+              <div class="actions">
+                <a class="btn btn-sm btn-ghost" href="/wardens/<%= w.warden_id %>/edit">Edit</a>
+                <form method="post" action="/wardens/<%= w.warden_id %>/reset-password" data-confirm="Reset the password of <%= w.name %> to the username?">
+                  <button class="btn btn-sm btn-ghost" type="submit">Reset password</button>
+                </form>
+                <form method="post" action="/wardens/<%= w.warden_id %>/delete" data-confirm="Delete warden <%= w.name %> and the login?">
+                  <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>
+<%- include('partials/foot') %>

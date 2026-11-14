@@ -1,0 +1,66 @@
+<%- include('partials/head', { title: 'Students' }) %>
+<div class="card">
+  <form class="toolbar" method="get" action="/students">
+    <div class="grow">
+      <label for="q">Search</label>
+      <input id="q" name="q" type="search" value="<%= q %>" placeholder="Name or roll number">
+    </div>
+    <div>
+      <label for="dept">Department</label>
+      <select id="dept" name="dept">
+        <option value="">All departments</option>
+        <% departments.forEach(function (d) { %>
+          <option value="<%= d.dept_id %>" <%= deptId === d.dept_id ? 'selected' : '' %>><%= d.dept_name %></option>
+        <% }); %>
+      </select>
+    </div>
+    <button class="btn btn-ghost" type="submit">Search</button>
+    <% if (user.role === 'ADMIN') { %><a class="btn btn-primary" href="/students/new">Add student</a><% } %>
+  </form>
+  <div class="toolbar">
+    <div class="grow">
+      <label for="live">Filter the rows below</label>
+      <input id="live" type="search" data-filter="students-table" placeholder="Type to filter this list">
+    </div>
+    <span class="muted"><%= students.length %> student(s)</span>
+  </div>
+
+  <% if (students.length === 0) { %>
+    <div class="empty-state"><%- icon('students') %><p>No students found.</p></div>
+  <% } else { %>
+  <div class="table-wrap">
+    <table id="students-table" class="table-stack">
+      <thead>
+        <tr><th>Roll no</th><th>Name</th><th>Gender</th><th>Department</th><th>Hostel / room</th><th>Status</th><th>Pending fees</th><% if (user.role === 'ADMIN') { %><th></th><% } %></tr>
+      </thead>
+      <tbody>
+        <% students.forEach(function (s) { %>
+          <tr>
+            <td data-label="Roll no"><%= s.roll_no %></td>
+            <td data-label="Name"><%= s.name %></td>
+            <td data-label="Gender"><%= s.gender === 'M' ? 'Male' : 'Female' %></td>
+            <td data-label="Department"><%= s.dept_code %></td>
+            <td data-label="Hostel / room"><%= s.room_number ? s.hostel_name + ' / ' + s.room_number : 'No room' %></td>
+            <td data-label="Status"><span class="badge badge-<%= s.status.toLowerCase() %>"><%= s.status.replace('_', ' ') %></span></td>
+            <td data-label="Pending fees"><%= Number(s.pending_dues) > 0 ? money(s.pending_dues) : '-' %></td>
+            <% if (user.role === 'ADMIN') { %>
+              <td data-label="Actions">
+                <div class="actions">
+                  <a class="btn btn-sm btn-ghost" href="/students/<%= s.roll_no %>/edit">Edit</a>
+                  <form method="post" action="/students/<%= s.roll_no %>/reset-password" data-confirm="Reset the password of <%= s.name %> to the roll number?">
+                    <button class="btn btn-sm btn-ghost" type="submit">Reset password</button>
+                  </form>
+                  <form method="post" action="/students/<%= s.roll_no %>/delete" data-confirm="Delete <%= s.name %> (<%= s.roll_no %>)? Their login, complaints and fees are deleted too.">
+                    <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                  </form>
+                </div>
+              </td>
+            <% } %>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>
+<%- include('partials/foot') %>

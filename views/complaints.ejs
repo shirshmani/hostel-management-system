@@ -1,0 +1,94 @@
+<%- include('partials/head', { title: title }) %>
+<%
+  // three-step status line (only fixed text goes into it)
+  function timeline(status) {
+    var steps = ['OPEN', 'IN_PROGRESS', 'RESOLVED'];
+    var at = steps.indexOf(status);
+    var html = '<ol class="timeline">';
+    steps.forEach(function (s, i) {
+      html += '<li class="' + (i < at ? 'done' : (i === at ? 'current' : '')) + '">' + s.replace('_', ' ') + '</li>';
+    });
+    return html + '</ol>';
+  }
+  function nice(category) { return category.charAt(0) + category.slice(1).toLowerCase(); }
+%>
+
+<% if (user.role === 'STUDENT') { %>
+  <div class="card">
+    <div class="section-head">
+      <h2>My complaints</h2>
+      <a class="btn btn-primary" href="/complaints/new">Raise a complaint</a>
+    </div>
+    <% if (complaints.length === 0) { %>
+      <div class="empty-state"><%- icon('complaints') %><p>You have not raised any complaint.</p></div>
+    <% } %>
+    <% complaints.forEach(function (c) { %>
+      <div class="complaint-card">
+        <div class="complaint-head">
+          <strong><%= nice(c.category) %></strong>
+          <span class="badge badge-<%= c.status.toLowerCase() %>"><%= c.status.replace('_', ' ') %></span>
+          <span class="muted">Raised <%= c.created_at.slice(0, 10) %></span>
+        </div>
+        <p><%= c.description %></p>
+        <%- timeline(c.status) %>
+        <% if (c.resolved_at) { %><p class="muted">Resolved on <%= c.resolved_at.slice(0, 10) %></p><% } %>
+        <% if (c.admin_remarks) { %><p><strong>Remarks:</strong> <%= c.admin_remarks %></p><% } %>
+      </div>
+    <% }); %>
+  </div>
+<% } else { %>
+  <div class="card">
+    <form class="toolbar" method="get" action="/complaints">
+      <div>
+        <label for="status">Status</label>
+        <select id="status" name="status">
+          <option value="">All</option>
+          <option value="OPEN" <%= statusFilter === 'OPEN' ? 'selected' : '' %>>Open</option>
+          <option value="IN_PROGRESS" <%= statusFilter === 'IN_PROGRESS' ? 'selected' : '' %>>In progress</option>
+          <option value="RESOLVED" <%= statusFilter === 'RESOLVED' ? 'selected' : '' %>>Resolved</option>
+        </select>
+      </div>
+      <div class="grow">
+        <label for="q">Keyword in the description</label>
+        <input id="q" name="q" type="search" value="<%= q %>" placeholder="e.g. tap leaking">
+        <div class="hint">Keyword search needs words of 3 or more letters.</div>
+      </div>
+      <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+    <p><span class="badge badge-open"><%= openStudents %> student(s) have an open complaint</span> <span class="muted"><%= complaints.length %> complaint(s) shown</span></p>
+
+    <% if (complaints.length === 0) { %>
+      <div class="empty-state"><%- icon('complaints') %><p>No complaints found.</p></div>
+    <% } %>
+    <% complaints.forEach(function (c) { %>
+      <div class="complaint-card">
+        <div class="complaint-head">
+          <strong>#<%= c.complaint_id %> <%= nice(c.category) %></strong>
+          <span class="badge badge-<%= c.status.toLowerCase() %>"><%= c.status.replace('_', ' ') %></span>
+          <span class="muted"><%= c.student_name %> (<%= c.roll_no %>) &middot; <%= c.hostel_name %> / <%= c.room_number %> &middot; <%= c.created_at.slice(0, 10) %></span>
+        </div>
+        <p><%= c.description %></p>
+        <%- timeline(c.status) %>
+        <% if (c.resolved_at) { %><p class="muted">Resolved on <%= c.resolved_at.slice(0, 10) %></p><% } %>
+        <form method="post" action="/complaints/<%= c.complaint_id %>/update">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="status-<%= c.complaint_id %>">Status</label>
+              <select id="status-<%= c.complaint_id %>" name="status">
+                <option value="OPEN" <%= c.status === 'OPEN' ? 'selected' : '' %>>Open</option>
+                <option value="IN_PROGRESS" <%= c.status === 'IN_PROGRESS' ? 'selected' : '' %>>In progress</option>
+                <option value="RESOLVED" <%= c.status === 'RESOLVED' ? 'selected' : '' %>>Resolved</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="remarks-<%= c.complaint_id %>">Remarks</label>
+              <textarea id="remarks-<%= c.complaint_id %>" name="admin_remarks" rows="2" maxlength="1000"><%= c.admin_remarks || '' %></textarea>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-primary" type="submit">Save</button>
+        </form>
+      </div>
+    <% }); %>
+  </div>
+<% } %>
+<%- include('partials/foot') %>

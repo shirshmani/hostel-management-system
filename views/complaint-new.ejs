@@ -1,0 +1,31 @@
+<%- include('partials/head', { title: 'Raise a complaint' }) %>
+<div class="card form-card">
+  <h2>Raise a complaint</h2>
+  <% if (!room || !room.room_id) { %>
+    <p class="muted">You do not have a room yet, so you cannot raise a complaint. Ask your warden about room allocation.</p>
+    <a class="btn btn-ghost" href="/complaints">Back</a>
+  <% } else { %>
+    <p class="muted">Room: <%= room.hostel_name %> / <%= room.room_number %> (filled in automatically)</p>
+    <form method="post" action="/complaints">
+      <div class="form-group">
+        <label for="category">Category</label>
+        <select id="category" name="category" required>
+          <option value="">Choose a category</option>
+          <% categories.forEach(function (c) { %>
+            <option value="<%= c %>" <%= form.category === c ? 'selected' : '' %>><%= c.charAt(0) + c.slice(1).toLowerCase() %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="description">What is the problem?</label>
+        <textarea id="description" name="description" rows="5" required minlength="5" maxlength="1000"><%= form.description %></textarea>
+        <div class="hint">5 to 1000 characters.</div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Submit complaint</button>
+        <a class="btn btn-ghost" href="/complaints">Cancel</a>
+      </div>
+    </form>
+  <% } %>
+</div>
+<%- include('partials/foot') %>

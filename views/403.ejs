@@ -1,0 +1,8 @@
+<%- include('partials/head', { title: 'Access denied' }) %>
+<div class="card center-card">
+  <div class="big-code">403</div>
+  <h2>Access denied</h2>
+  <p class="muted">Your role (<%= user.role %>) is not allowed to open this page.</p>
+  <a class="btn btn-primary" href="<%= homeUrl %>">Back to my home page</a>
+</div>
+<%- include('partials/foot') %>

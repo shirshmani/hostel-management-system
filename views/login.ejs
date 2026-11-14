@@ -1,0 +1,47 @@
+<%- include('partials/head', { title: 'Login', bare: true }) %>
+<div class="login-wrap">
+  <section class="login-brand">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="login-brand-text">
+      <span class="brand-mark">H</span>
+      <h1>Hostel Management System</h1>
+      <p>Rooms, allocation, complaints and fees for the college hostel, in one place.</p>
+    </div>
+  </section>
+
+  <section class="login-panel">
+    <button class="icon-btn login-theme" id="theme-toggle" type="button" aria-label="Switch light or dark theme">
+      <span class="icon-moon"><%- icon('moon') %></span><span class="icon-sun"><%- icon('sun') %></span>
+    </button>
+    <form class="login-form" method="post" action="/login">
+      <h2>Welcome back</h2>
+      <p class="muted">Log in with the username your admin gave you.</p>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" required autofocus autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required autocomplete="current-password">
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Log in</button>
+
+      <details class="demo-box">
+        <summary>Demo logins</summary>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Role</th><th>Username</th><th>Password</th></tr></thead>
+            <tbody>
+              <tr><td>Admin</td><td>admin</td><td>admin123</td></tr>
+              <tr><td>Warden</td><td>warden1</td><td>warden123</td></tr>
+              <tr><td>Student</td><td>24CSE001</td><td>24CSE001</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </form>
+  </section>
+</div>
+<%- include('partials/foot', { bare: true }) %>

@@ -1,0 +1,17 @@
+<%- include('partials/head', { title: 'Receipt' }) %>
+<div class="card receipt">
+  <h2>Hostel fee receipt</h2>
+  <dl class="kv">
+    <dt>Receipt no</dt><dd><%= receiptNo %></dd>
+    <dt>Student</dt><dd><%= fee.student_name %> (<%= fee.roll_no %>)</dd>
+    <dt>Room</dt><dd><%= fee.room_number ? fee.hostel_name + ' / ' + fee.room_number : 'No room now' %></dd>
+    <dt>Term</dt><dd><%= fee.term %></dd>
+    <dt>Amount paid</dt><dd><%= money(fee.amount) %></dd>
+    <dt>Paid on</dt><dd><%= fee.paid_on %></dd>
+  </dl>
+  <div class="form-actions no-print">
+    <button class="btn btn-primary" type="button" data-print>Print</button>
+    <a class="btn btn-ghost" href="/fees">Back to fees</a>
+  </div>
+</div>
+<%- include('partials/foot') %>

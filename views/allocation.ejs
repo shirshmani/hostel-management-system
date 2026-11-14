@@ -1,0 +1,175 @@
+<%- include('partials/head', { title: 'Allocation' }) %>
+<div class="card">
+  <div class="section-head">
+    <h2><%= hostel.hostel_name %> <span class="badge"><%= hostel.gender_type === 'M' ? 'Boys' : 'Girls' %></span></h2>
+    <% if (user.role === 'ADMIN') { %>
+      <form class="toolbar" method="get" action="/allocation">
+        <div>
+          <label for="hostel">Hostel</label>
+          <select id="hostel" name="hostel">
+            <% hostels.forEach(function (h) { %>
+              <option value="<%= h.hostel_id %>" <%= h.hostel_id === hostel.hostel_id ? 'selected' : '' %>><%= h.hostel_name %></option>
+            <% }); %>
+          </select>
+        </div>
+        <button class="btn btn-ghost" type="submit">Show</button>
+      </form>
+    <% } %>
+  </div>
+
+  <div class="legend">
+    <span class="badge badge-resolved">Green: has space</span>
+    <span class="badge badge-pending">Amber: one bed left</span>
+    <span class="badge badge-overdue">Red: full</span>
+  </div>
+  <% if (rooms.length === 0) { %>
+    <div class="empty-state"><%- icon('rooms') %><p>This hostel has no rooms yet.</p></div>
+  <% } %>
+  <%
+    var floors = {};
+    rooms.forEach(function (r) { (floors[r.floor] = floors[r.floor] || []).push(r); });
+  %>
+  <div class="room-map">
+    <% Object.keys(floors).forEach(function (f) { %>
+      <div class="floor">
+        <h3>Floor <%= f %></h3>
+        <div class="room-grid">
+          <% floors[f].forEach(function (r) {
+               var cls = r.vacancies === 0 ? 'room-red' : (r.vacancies === 1 && r.capacity > 1 ? 'room-amber' : 'room-green'); %>
+            <button type="button" class="room-tile <%= cls %>" data-room-id="<%= r.room_id %>" <%= r.vacancies === 0 ? 'disabled' : '' %>>
+              <strong><%= r.room_number %></strong>
+              <span><%= roomType(r.capacity) %></span>
+              <span class="beds"><% for (var i = 0; i < r.capacity; i++) { %><i class="bed <%= i < r.occupied ? 'filled' : '' %>"></i><% } %></span>
+            </button>
+          <% }); %>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Allocate a room</h2>
+  <% if (waiting.length === 0) { %>
+    <div class="empty-state"><%- icon('students') %><p>No students are waiting for this hostel.</p></div>
+  <% } else if (freeRooms.length === 0) { %>
+    <div class="empty-state"><%- icon('rooms') %><p>No free beds in this hostel.</p></div>
+  <% } else { %>
+    <form method="post" action="/allocation/allocate">
+      <input type="hidden" name="hostel_id" value="<%= hostel.hostel_id %>">
+      <div class="form-group">
+        <label for="waiting-filter">Find a student</label>
+        <input id="waiting-filter" type="search" data-filter="waiting-table" placeholder="Name or roll number">
+      </div>
+      <div class="table-wrap pick-list">
+        <table id="waiting-table">
+          <thead><tr><th></th><th>Roll no</th><th>Name</th><th>Admitted</th></tr></thead>
+          <tbody>
+            <% waiting.forEach(function (s) { %>
+              <tr>
+                <td><input type="radio" name="roll_no" value="<%= s.roll_no %>" required aria-label="Choose <%= s.name %>"></td>
+                <td><%= s.roll_no %></td><td><%= s.name %></td><td><%= s.admission_year %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="allocate-room">Room</label>
+          <select id="allocate-room" name="room_id" required>
+            <option value="">Choose a room (or click a tile above)</option>
+            <% freeRooms.forEach(function (r) { %>
+              <option value="<%= r.room_id %>">Floor <%= r.floor %> - Room <%= r.room_number %> - <%= roomType(r.capacity) %> - <%= r.vacancies %> free</option>
+            <% }); %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="check_in">Check-in date</label>
+          <input id="check_in" name="check_in" type="date" value="<%= today %>" max="<%= today %>" required>
+        </div>
+      </div>
+      <button class="btn btn-primary" type="submit">Allocate</button>
+    </form>
+  <% } %>
+</div>
+
+<div class="card">
+  <h2>Move a student</h2>
+  <p class="muted">Within this hostel only. To change hostel, vacate the student first and allocate in the other hostel.</p>
+  <% if (residents.length === 0 || freeRooms.length === 0) { %>
+    <div class="empty-state"><p>Needs at least one resident and one room with a free bed.</p></div>
+  <% } else { %>
+    <form method="post" action="/allocation/move">
+      <input type="hidden" name="hostel_id" value="<%= hostel.hostel_id %>">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="move-student">Student</label>
+          <select id="move-student" name="roll_no" required>
+            <option value="">Choose a student</option>
+            <% residents.forEach(function (s) { %>
+              <option value="<%= s.roll_no %>"><%= s.name %> (<%= s.roll_no %>) - room <%= s.room_number %></option>
+            <% }); %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="move-room">New room</label>
+          <select id="move-room" name="room_id" required>
+            <option value="">Choose a room</option>
+            <% freeRooms.forEach(function (r) { %>
+              <option value="<%= r.room_id %>">Floor <%= r.floor %> - Room <%= r.room_number %> - <%= r.vacancies %> free</option>
+            <% }); %>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" type="submit">Move</button>
+    </form>
+  <% } %>
+</div>
+
+<div class="card">
+  <h2>Residents</h2>
+  <% if (residents.length === 0) { %>
+    <div class="empty-state"><%- icon('students') %><p>Nobody lives in this hostel yet.</p></div>
+  <% } else { %>
+    <div class="table-wrap">
+      <table class="table-stack">
+        <thead><tr><th>Roll no</th><th>Name</th><th>Room</th><th>Status</th><th>Check-in</th><th></th></tr></thead>
+        <tbody>
+          <% residents.forEach(function (s) { %>
+            <tr>
+              <td data-label="Roll no"><%= s.roll_no %></td>
+              <td data-label="Name"><%= s.name %></td>
+              <td data-label="Room"><%= s.room_number %></td>
+              <td data-label="Status"><span class="badge badge-<%= s.status.toLowerCase() %>"><%= s.status.replace('_', ' ') %></span></td>
+              <td data-label="Check-in"><%= s.check_in_date || '-' %></td>
+              <td data-label="Actions">
+                <form method="post" action="/allocation/vacate" data-confirm="Vacate <%= s.name %> from room <%= s.room_number %>?">
+                  <input type="hidden" name="hostel_id" value="<%= hostel.hostel_id %>">
+                  <input type="hidden" name="roll_no" value="<%= s.roll_no %>">
+                  <button class="btn btn-sm btn-danger" type="submit">Vacate</button>
+                </form>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<% if (user.role === 'ADMIN') { %>
+<div class="card">
+  <h2>Year-end checkout</h2>
+  <p class="muted">Vacates every student admitted in or before the year below, in all hostels.</p>
+  <form class="toolbar" method="post" action="/allocation/year-end" data-confirm="Vacate every student admitted in or before this year, in all hostels? This cannot be undone.">
+    <input type="hidden" name="hostel_id" value="<%= hostel.hostel_id %>">
+    <div>
+      <label for="max_year">Admitted in or before</label>
+      <input id="max_year" name="max_year" type="number" min="2000" max="<%= thisYear %>" value="<%= thisYear - 1 %>" required>
+    </div>
+    <button class="btn btn-danger" type="submit">Run checkout</button>
+  </form>
+</div>
+<% } %>
+<%- include('partials/foot') %>

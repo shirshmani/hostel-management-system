@@ -1,0 +1,52 @@
+<%- include('partials/head', { title: 'Dashboard' }) %>
+<div class="card">
+  <div class="section-head">
+    <h2>Welcome, <%= user.name %></h2>
+    <span class="muted"><%= user.role === 'ADMIN' ? 'Whole system' : user.hostelName %></span>
+  </div>
+  <% if (over80.length > 0) { %>
+    <p>
+      <% over80.forEach(function (h) { %>
+        <span class="badge badge-warn"><%= h.hostel_name %> is <%= h.pct %>% full</span>
+      <% }); %>
+    </p>
+  <% } %>
+</div>
+
+<div class="stat-grid">
+  <% cards.forEach(function (c) { %>
+    <div class="stat-card accent-<%= c.accent %>">
+      <div class="stat-icon"><%- icon(c.icon) %></div>
+      <div>
+        <div class="stat-value"><%= c.value %></div>
+        <div class="stat-label"><%= c.label %></div>
+        <div class="stat-sub"><%= c.sub %></div>
+      </div>
+    </div>
+  <% }); %>
+</div>
+
+<div class="card">
+  <h2>Occupancy</h2>
+  <% occupancy.forEach(function (h) { %>
+    <div class="occ-row">
+      <div class="occ-top">
+        <strong><%= h.hostel_name %></strong>
+        <span class="muted"><%= h.occupied %> / <%= h.beds %> beds &middot; <%= h.pct %>% &middot; rank <%= h.rank %> of <%= h.rankOf %></span>
+      </div>
+      <div class="occ-bar"><div class="occ-fill <%= h.pct > 80 ? 'warn' : '' %>" style="width: <%= h.pct %>%"></div></div>
+    </div>
+  <% }); %>
+</div>
+
+<div class="chart-grid">
+  <div class="card"><h2>Complaints by status</h2><div class="chart-box"><canvas id="chart-status"></canvas></div></div>
+  <div class="card"><h2>Complaints by category</h2><div class="chart-box"><canvas id="chart-category"></canvas></div></div>
+  <div class="card"><h2>Fees collected and pending</h2><div class="chart-box"><canvas id="chart-fees"></canvas></div></div>
+  <div class="card"><h2>Fees collected so far</h2><div class="chart-box"><canvas id="chart-running"></canvas></div></div>
+  <div class="card"><h2>Complaints in the last 7 days</h2><div class="chart-box"><canvas id="chart-days"></canvas></div></div>
+</div>
+
+<script type="application/json" id="dashboard-data"><%- JSON.stringify(data).replace(/</g, '\\u003c') %></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<%- include('partials/foot') %>
