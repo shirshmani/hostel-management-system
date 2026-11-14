@@ -11,7 +11,8 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   dateStrings: true,          // DATE columns come back as 'YYYY-MM-DD' strings
-  connectTimeout: 30000       // 30 seconds wait for Render hosting spin-down
+  connectTimeout: 30000,       // 30 seconds wait for Render hosting spin-down
+  ssl: { rejectUnauthorized: false }        // For SSL connection with external database server
 });
 
 // Runs one prepared statement (? placeholders) and returns the rows.
