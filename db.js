@@ -10,7 +10,8 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME || 'hostel_db',
   waitForConnections: true,
   connectionLimit: 10,
-  dateStrings: true          // DATE columns come back as 'YYYY-MM-DD' strings
+  dateStrings: true,          // DATE columns come back as 'YYYY-MM-DD' strings
+  connectTimeout: 30000       // 30 seconds wait for Render hosting spin-down
 });
 
 // Runs one prepared statement (? placeholders) and returns the rows.
